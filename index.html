@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Runner Game</title>
+<style>
+body { margin:0; overflow:hidden; background:#111; }
+canvas { display:block; margin:auto; background:#222; }
+</style>
+</head>
+<body>
+
+<canvas id="gameCanvas" width="400" height="600"></canvas>
+
+<script>
+let canvas = document.getElementById("gameCanvas");
+let ctx = canvas.getContext("2d");
+
+let player = { x:180, y:500, w:40, h:40, color:"lime" };
+let obstacles = [];
+let speed = 4;
+let score = 0;
+
+document.addEventListener("keydown", e => {
+    if (e.key === "ArrowLeft") player.x -= 40;
+    if (e.key === "ArrowRight") player.x += 40;
+});
+
+function spawnObstacle() {
+    let x = Math.floor(Math.random()*10)*40;
+    obstacles.push({ x:x, y:-40, w:40, h:40 });
+}
+
+function update() {
+    ctx.clearRect(0,0,400,600);
+
+    // Player
+    ctx.fillStyle = player.color;
+    ctx.fillRect(player.x, player.y, player.w, player.h);
+
+    // Obstacles
+    ctx.fillStyle = "red";
+    for (let i=0; i<obstacles.length; i++) {
+        obstacles[i].y += speed;
+        ctx.fillRect(obstacles[i].x, obstacles[i].y, 40, 40);
+
+        // Collision
+        if (player.x < obstacles[i].x + 40 &&
+            player.x + 40 > obstacles[i].x &&
+            player.y < obstacles[i].y + 40 &&
+            player.y + 40 > obstacles[i].y) {
+                alert("Game Over! Score: " + score);
+                document.location.reload();
+        }
+    }
+
+    score++;
+    ctx.fillStyle="white";
+    ctx.fillText("Score: " + score, 10, 20);
+
+    requestAnimationFrame(update);
+}
+
+setInterval(spawnObstacle, 1000);
+update();
+</script>
+
+</body>
+</html>
